@@ -10,6 +10,7 @@ import UIKit
 
 class ViewController: UIViewController {
 
+
     @IBOutlet weak var resultLabel: UILabel!
     var firstNumberText = "8000"
     var secondNumberText = ""
@@ -17,6 +18,13 @@ class ViewController: UIViewController {
     var isFirstNumber = true
     var hasOp = false
     var canClear = true
+
+    
+    @IBOutlet weak var resultLabelOther: UILabel!
+    var firstNumberTextOther = "8000"
+    var secondNumberTextOther = ""
+    
+    var isFirstPlayer = true;
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,7 +41,10 @@ class ViewController: UIViewController {
            // resultLabel.text = ""
             canClear = false
         }
-        let currentText = resultLabel.text!
+        var currentText = resultLabel.text!
+        if (isFirstPlayer == false){
+            currentText = resultLabelOther.text!
+        }
         let textLabel = sender.titleLabel?.text
         if let text = textLabel {
             switch text{
@@ -44,7 +55,12 @@ class ViewController: UIViewController {
                 op = text
                 isFirstNumber = false
                 hasOp = true
-                resultLabel.text = "\(currentText)"
+                if (isFirstPlayer){
+                    resultLabel.text = "\(currentText)"
+                }
+                else {
+                    resultLabelOther.text = "\(currentText)"
+                }
                 break
             case "=":
                 if (hasOp == true){
@@ -52,8 +68,18 @@ class ViewController: UIViewController {
                 hasOp = false
                 canClear = true
                 let result = Int32(calculate())
-                resultLabel.text = "\(result)"
-                firstNumberText = "\(result)"
+                    if (isFirstPlayer){
+                        resultLabel.text = "\(result)"
+                        firstNumberText = "\(result)"
+                        isFirstPlayer = false;
+                        secondNumberText = ""
+                    }
+                    else {
+                        resultLabelOther.text = "\(result)"
+                        firstNumberTextOther = "\(result)"
+                        isFirstPlayer = true;
+                        secondNumberTextOther = ""
+                    }
                 }
                 break
             case "del":
@@ -61,31 +87,55 @@ class ViewController: UIViewController {
                     if (secondNumberText == ""){
                     }
                     else {
-                    let lengthSecondNumberText = secondNumberText.characters.count;
-                    secondNumberText = (String)(secondNumberText.prefix(lengthSecondNumberText - 1))
-                    resultLabel.text = "\(secondNumberText)"
+                        if (isFirstPlayer){
+                            let lengthSecondNumberText = secondNumberText.characters.count;
+                            secondNumberText = (String)(secondNumberText.prefix(lengthSecondNumberText - 1))
+                            resultLabel.text = "\(secondNumberText)"
+                        }
+                        else {
+                            let lengthSecondNumberText = secondNumberTextOther.characters.count;
+                            secondNumberTextOther = (String)(secondNumberTextOther.prefix(lengthSecondNumberText - 1))
+                            resultLabelOther.text = "\(secondNumberTextOther)"
+                        }
                     }
                 }
                 break
             default:
-                if isFirstNumber{
-                    firstNumberText = "\(firstNumberText)"
+                if (isFirstPlayer){
+                    if isFirstNumber{
+                        firstNumberText = "\(firstNumberText)"
+                    }
+                    else {
+                        secondNumberText = "\(secondNumberText)\(text)"
+                        resultLabel.text = "\(secondNumberText)"
+                    }
+                
+                    break;
                 }
                 else {
-                    secondNumberText = "\(secondNumberText)\(text)"
-                    resultLabel.text = "\(secondNumberText)"
+                    if isFirstNumber{
+                        firstNumberTextOther = "\(firstNumberTextOther)"
+                    }
+                    else {
+                        secondNumberTextOther = "\(secondNumberTextOther)\(text)"
+                        resultLabelOther.text = "\(secondNumberTextOther)"
+                    }
                 }
-                
-                break;
             }
         }
     }
     
     func calculate() -> Double {
-        let firstNumber = Double(firstNumberText)!
-        let secondNumber = Double(secondNumberText)!
-        firstNumberText = ""
-        secondNumberText = ""
+        var firstNumber = 0.0
+        var secondNumber = 0.0
+        if (isFirstPlayer){
+            firstNumber = Double(firstNumberText)!
+            secondNumber = Double(secondNumberText)!
+        }
+            else {
+            firstNumber = Double(firstNumberTextOther)!
+            secondNumber = Double(secondNumberTextOther)!
+            }
         switch op {
         case "+":
             return firstNumber + secondNumber
